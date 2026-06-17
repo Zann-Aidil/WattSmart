@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Clock, DollarSign, Calendar, Activity, Zap, TrendingUp, TrendingDown } from 'lucide-react';
+import { useState, useEffect, useContext } from 'react';
+import { LineChart, Line, BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Clock, DollarSign, Calendar, Activity, Zap } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 
 const Dashboard = () => {
@@ -19,7 +19,7 @@ const Dashboard = () => {
         if (!res.ok) throw new Error('Gagal memuat');
         const responseData = await res.json();
         const historyData = responseData.data || [];
-        
+
         if (historyData.length === 0) {
           setData(null);
           setLoading(false);
@@ -30,12 +30,12 @@ const Dashboard = () => {
         const dateMap = {};
         let totalKwh = 0;
         let totalCost = 0;
-        
+
         historyData.forEach(item => {
           totalKwh += item.pred_kwh;
           totalCost += item.est_biaya;
-          const dt = new Date(item.tanggal).toLocaleDateString('id-ID', {day: 'numeric', month: 'short'});
-          if(!dateMap[dt]) dateMap[dt] = 0;
+          const dt = new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+          if (!dateMap[dt]) dateMap[dt] = 0;
           dateMap[dt] += item.pred_kwh;
         });
 
@@ -54,15 +54,19 @@ const Dashboard = () => {
           lastKwh: lastKwh.toFixed(2)
         });
 
-        // Pie Chart: Distribusi (Dummy logic, can be improved later)
-        const distribusi = [
-          { name: 'Perangkat', value: 45, color: '#10b981' }, 
-          { name: 'Pencahayaan', value: 20, color: '#3b82f6' }, 
-          { name: 'Elektronik', value: 15, color: '#f59e0b' }, 
-          { name: 'Lainnya', value: 20, color: '#8b5cf6' } 
+        // Bar Chart: count predictions per kategori
+        const kategoriCount = { rendah: 0, sedang: 0, tinggi: 0, sangat_tinggi: 0 };
+        historyData.forEach(item => {
+          if (kategoriCount[item.kategori] !== undefined) kategoriCount[item.kategori]++;
+        });
+        const kategoriData = [
+          { name: 'Rendah',        value: kategoriCount.rendah,        fill: '#10b981' },
+          { name: 'Sedang',        value: kategoriCount.sedang,        fill: '#3b82f6' },
+          { name: 'Tinggi',        value: kategoriCount.tinggi,        fill: '#f59e0b' },
+          { name: 'Sangat Tinggi', value: kategoriCount.sangat_tinggi, fill: '#ef4444' },
         ];
 
-        setData({ trend, distribusi });
+        setData({ trend, kategoriData });
       } catch (err) {
         console.error(err);
       } finally {
@@ -99,7 +103,6 @@ const Dashboard = () => {
           <h3 className="text-xl font-bold mb-2 flex items-center gap-2">Selamat datang kembali, {user?.username}! <span className="text-2xl">👋</span></h3>
           <p className="text-muted text-sm">Pantau dan kelola konsumsi listrik rumah Anda dengan mudah.</p>
         </div>
-        
         <div className="bg-white border border-gray-200 rounded-lg px-4 py-2 flex items-center gap-2 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors">
           <Calendar size={16} className="text-muted" />
           <span className="text-sm font-semibold text-primary">Hari ini</span>
@@ -108,48 +111,33 @@ const Dashboard = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {/* Card 1 */}
         <div className="card flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-1.5 bg-emerald-50 text-emerald rounded-md"><Clock size={16} /></div>
             <span className="text-xs text-muted font-medium">Prediksi Terbaru</span>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-primary mb-1">{stats.lastKwh} kWh</div>
-          </div>
+          <div className="text-2xl font-bold text-primary mb-1">{stats.lastKwh} kWh</div>
         </div>
-
-        {/* Card 2 */}
         <div className="card flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-1.5 bg-orange-50 text-orange-500 rounded-md"><Activity size={16} /></div>
             <span className="text-xs text-muted font-medium">Rata-rata Harian</span>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-primary mb-1">{stats.avgKwh} kWh</div>
-          </div>
+          <div className="text-2xl font-bold text-primary mb-1">{stats.avgKwh} kWh</div>
         </div>
-
-        {/* Card 3 */}
         <div className="card flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-1.5 bg-purple-50 text-purple-500 rounded-md"><Zap size={16} /></div>
             <span className="text-xs text-muted font-medium">Total Konsumsi</span>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-primary mb-1">{stats.totalKwh} kWh</div>
-          </div>
+          <div className="text-2xl font-bold text-primary mb-1">{stats.totalKwh} kWh</div>
         </div>
-
-        {/* Card 4 */}
         <div className="card flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-3">
             <div className="p-1.5 bg-blue-50 text-blue-500 rounded-md"><DollarSign size={16} /></div>
             <span className="text-xs text-muted font-medium">Total Biaya (Estimasi)</span>
           </div>
-          <div>
-            <div className="text-2xl font-bold text-primary mb-1">Rp {stats.cost.toLocaleString('id-ID')}</div>
-          </div>
+          <div className="text-2xl font-bold text-primary mb-1">Rp {stats.cost.toLocaleString('id-ID')}</div>
         </div>
       </div>
 
@@ -161,9 +149,9 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data.trend} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)', fontSize: 11}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-secondary)', fontSize: 11}} />
-                <Tooltip 
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} />
+                <Tooltip
                   contentStyle={{ borderRadius: '8px', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)' }}
                   itemStyle={{ color: 'var(--text-primary)', fontWeight: 600 }}
                   labelStyle={{ color: 'var(--text-secondary)', fontSize: '12px', marginBottom: '4px' }}
@@ -175,42 +163,25 @@ const Dashboard = () => {
         </div>
 
         <div className="card flex flex-col">
-          <h4 className="font-bold text-sm mb-4 text-primary">Distribusi Konsumsi</h4>
-          <div className="flex-grow flex items-center justify-center">
-            <div className="h-48 w-full relative">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={data.distribusi}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={2}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {data.distribusi.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    formatter={(value) => [`${value}%`, 'Distribusi']} 
-                    contentStyle={{ borderRadius: '8px', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)', fontSize: '12px' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              {/* Custom Legend */}
-              <div className="absolute top-0 right-0 h-full flex flex-col justify-center gap-2">
-                {data.distribusi.map((entry, index) => (
-                  <div key={index} className="flex items-center gap-2 text-[10px]">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }}></div>
-                    <span className="text-muted w-16">{entry.name}</span>
-                    <span className="font-bold text-primary">{entry.value}%</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <h4 className="font-bold text-sm mb-4 text-primary">Distribusi Kategori</h4>
+          <p className="text-xs text-muted mb-4">Berdasarkan riwayat prediksi</p>
+          <div className="flex-grow h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data.kategoriData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-secondary)', fontSize: 9 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--text-secondary)', fontSize: 10 }} />
+                <Tooltip
+                  contentStyle={{ borderRadius: '8px', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)', fontSize: '12px' }}
+                  formatter={(value) => [value, 'Prediksi']}
+                />
+                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                  {data.kategoriData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
