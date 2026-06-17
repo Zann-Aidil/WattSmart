@@ -21,7 +21,7 @@ import joblib
 import numpy as np
 import pandas as pd
 
-from ml.preprocessing import PreprocessingPipeline, build_inference_frame
+from ml.preprocessing import PreprocessingPipeline, build_inference_frame, DATE_COL
 
 
 DEFAULT_MODEL_PATH = Path("ml/models/xgboost_model.pkl")
@@ -79,8 +79,14 @@ class EnergyPredictor:
             jam_penggunaan_rata_rata=jam_penggunaan_rata_rata,
             history_kwh=history_kwh,
         )
-        X = self.pipeline.transform(df)
-        y_hat = float(self.model.predict(X.values)[0])
+        # Convert tanggal datetime64 → int64 so StandardScaler can process it as numeric
+        if DATE_COL in df.columns and pd.api.types.is_datetime64_any_dtype(df[DATE_COL]):
+            df[DATE_COL] = df[DATE_COL].astype("int64")
+        # Align columns to training order; fill any unexpected missing with 0
+        df = df.reindex(columns=self.feature_names, fill_value=0.0)
+        arr = self.pipeline.transform(df.to_numpy(dtype=float))
+        X = pd.DataFrame(arr, columns=self.feature_names)
+        y_hat = float(self.model.predict(arr)[0])
         # Clamp - consumption cannot be negative.
         y_hat = max(0.0, y_hat)
         return PredictionResult(predicted_kwh=y_hat, feature_frame=X)
