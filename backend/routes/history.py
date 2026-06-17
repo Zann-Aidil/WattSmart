@@ -70,3 +70,23 @@ def get_user_history(
     ]
 
     return HistoryResponse(data=items, total=total, limit=limit, offset=offset)
+
+
+class DeleteHistoryResponse(BaseModel):
+    message: str
+    deleted_count: int
+
+
+@router.delete("/history", response_model=DeleteHistoryResponse, summary="Hapus semua riwayat prediksi")
+def delete_user_history(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> DeleteHistoryResponse:
+    count = db.query(PredictionHistory).filter(
+        PredictionHistory.user_id == current_user.id
+    ).count()
+    db.query(PredictionHistory).filter(
+        PredictionHistory.user_id == current_user.id
+    ).delete()
+    db.commit()
+    return DeleteHistoryResponse(message="Riwayat berhasil dihapus", deleted_count=count)
