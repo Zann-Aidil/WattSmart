@@ -30,3 +30,39 @@ export const getDashboardData = async () => {
     throw error;
   }
 };
+
+export const updateProfile = async (data) => {
+  try {
+    const response = await axios.put(`${API_URL}/auth/profile`, data, {
+      headers: getAuthHeaders()
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    throw error;
+  }
+};
+
+export const changePassword = async (data) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/change-password`, data, {
+      headers: getAuthHeaders()
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error changing password:', error);
+    throw error;
+  }
+};
+
+export const deleteHistory = async () => {
+  try {
+    const response = await axios.delete(`${API_URL}/history`, {
+      headers: getAuthHeaders()
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting history:', error);
+    throw error;
+  }
+};
