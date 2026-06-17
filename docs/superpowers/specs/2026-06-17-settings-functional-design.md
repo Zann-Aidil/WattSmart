@@ -23,7 +23,16 @@ email: Mapped[Optional[str]] = mapped_column(String, nullable=True, default=None
 ```
 Use SQLAlchemy `create_all()` (already called at startup) — this adds the column on next startup for SQLite.
 
-### 2. New Schemas (schemas.py)
+### 2. Update GET /api/auth/me response
+Add `email` to `UserMeResponse` so the Settings page can populate the email field on mount:
+```python
+class UserMeResponse(BaseModel):
+    username: str
+    email: Optional[str]
+    created_at: str
+```
+
+### 3. New Schemas (schemas.py)
 ```python
 class UpdateProfileRequest(BaseModel):
     email: Optional[str] = None
@@ -40,21 +49,21 @@ class ChangePasswordResponse(BaseModel):
     message: str
 ```
 
-### 3. PUT /api/auth/profile
+### 4. PUT /api/auth/profile
 - Auth: required (Bearer token)
 - Input: `UpdateProfileRequest` (email)
 - Logic: update `user.email` in DB
 - Output: `UpdateProfileResponse`
 - Error: 400 if email already taken by another user (skip uniqueness for now — nullable, no unique constraint)
 
-### 4. POST /api/auth/change-password
+### 5. POST /api/auth/change-password
 - Auth: required (Bearer token)
 - Input: `ChangePasswordRequest` (current_password, new_password)
 - Logic: verify current password with bcrypt, hash new password, update DB
 - Output: `ChangePasswordResponse { message: "Password berhasil diubah" }`
 - Error: 400 if current_password wrong
 
-### 5. DELETE /api/history
+### 6. DELETE /api/history
 - Auth: required (Bearer token)
 - Logic: delete all `PredictionHistory` rows where `user_id == current_user.id`
 - Output: `{ "message": "Riwayat berhasil dihapus", "deleted_count": N }`
@@ -78,7 +87,7 @@ const [notifToggles, setNotifToggles] = useState(() => {
 ### Profil Section
 - Email `<input>` controlled with `value={email}` and `onChange`
 - "Simpan Perubahan" calls `updateProfile({ email })`, shows loading/success/error feedback inline
-- On mount: fetch `/api/auth/me` to populate username (already done) and email if returned
+- On mount: fetch `/api/auth/me` to populate username (already done) and `email` (now included in updated response)
 
 ### Ubah Kata Sandi
 - Inline modal (absolute positioned card or simple conditional render below button)
