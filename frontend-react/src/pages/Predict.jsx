@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import { useState, useContext } from 'react';
 import { predictConsumption } from '../services/api';
-import { 
-  Calendar, Clock, Thermometer, Users, Monitor, 
-  Clock3, Zap, ArrowLeft, Download, Share2, 
-  Lightbulb, CheckCircle, AlertTriangle, Info, TrendingUp, TrendingDown, Leaf
+import {
+  Calendar, Clock, Thermometer, Users, Monitor,
+  Clock3, Zap, Download,
+  Lightbulb, Info, TrendingUp, TrendingDown, Leaf
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { AuthContext } from '../context/AuthContext';
 
 const Predict = () => {
+  const { token } = useContext(AuthContext);
   const today = new Date().toISOString().split('T')[0];
   const [formData, setFormData] = useState({
     tanggal: today,
@@ -24,14 +26,11 @@ const Predict = () => {
   const [error, setError] = useState(null);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
     if (type === 'radio' && name === 'is_holiday') {
       setFormData(prev => ({ ...prev, is_holiday: value === 'true' }));
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value
-      }));
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
@@ -40,7 +39,6 @@ const Predict = () => {
     setLoading(true);
     setError(null);
 
-    // Prepare data payload for Pydantic schema
     const payload = {
       tanggal: formData.tanggal,
       jam: parseInt(formData.jam),
@@ -54,22 +52,45 @@ const Predict = () => {
 
     try {
       const data = await predictConsumption(payload);
-      
-      const mockChart = [];
-      const baseDate = new Date(formData.tanggal);
-      for(let i=6; i>=1; i--) {
-        const d = new Date(baseDate);
-        d.setDate(d.getDate() - i);
-        mockChart.push({
-          date: `${d.getDate()} Jun`,
-          aktual: (12 + Math.random() * 15).toFixed(1)
+
+      // Fetch last 7 history items for chart and comparison
+      let historyItems = [];
+      try {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+        const histRes = await fetch(`${API_URL}/history?limit=10`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
-      }
-      mockChart.push({
-        date: `${baseDate.getDate()} Jun`,
-        prediksi: data.prediction?.pred_kwh?.toFixed(1) || 18.7
+        if (histRes.ok) {
+          const histData = await histRes.json();
+          historyItems = histData.data || [];
+        }
+      } catch { /* ignore history fetch failure */ }
+
+      // Build chart: 7 most recent (oldest first) + today's prediction
+      const chartData = historyItems
+        .slice(0, 7)
+        .reverse()
+        .map(h => ({
+          date: h.tanggal,
+          aktual: parseFloat(h.pred_kwh.toFixed(1)),
+        }));
+      chartData.push({
+        date: formData.tanggal,
+        prediksi: parseFloat(data.prediksi.prediksi_kwh.toFixed(1)),
       });
-      setResult({ 
+
+      // Comparison: vs average of last 7
+      let comparison = null;
+      if (historyItems.length > 0) {
+        const slice = historyItems.slice(0, 7);
+        const avg = slice.reduce((s, h) => s + h.pred_kwh, 0) / slice.length;
+        if (avg > 0) {
+          const pct = ((data.prediksi.prediksi_kwh - avg) / avg * 100).toFixed(1);
+          comparison = { pct, up: parseFloat(pct) > 0 };
+        }
+      }
+
+      setResult({
         prediction: data.prediksi,
         kategori: data.prediksi.kategori_konsumsi,
         recommendations: data.rekomendasi.rekomendasi.map(r => ({
@@ -77,9 +98,10 @@ const Predict = () => {
           priority: r.prioritas === 'high' ? 'Tinggi' : r.prioritas === 'medium' ? 'Sedang' : 'Rendah',
           savings: `${r.estimasi_hemat_kwh} kWh`
         })),
-        chartData: mockChart 
+        chartData,
+        comparison,
       });
-    } catch (err) {
+    } catch {
       setError('Gagal mendapatkan prediksi. Pastikan Anda sudah login dan server berjalan.');
       setResult(null);
     } finally {
@@ -208,7 +230,7 @@ const Predict = () => {
           </div>
         </div>
 
-        {/* Right: Results / Helper */}
+        {/* Right: Results */}
         <div className="lg:col-span-2">
           {!result && !loading && (
             <div className="h-full flex flex-col items-center justify-center bg-white border border-gray-100 border-dashed rounded-xl p-12 text-center min-h-[500px]" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-card)' }}>
@@ -219,15 +241,14 @@ const Predict = () => {
               <p className="text-muted max-w-md mx-auto mb-8 leading-relaxed">
                 Silakan lengkapi parameter prediksi di sebelah kiri dan klik tombol "Tampilkan Prediksi & Saran" untuk melihat estimasi konsumsi listrik beserta rekomendasi penghematannya.
               </p>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full text-left">
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                  <div className="flex items-center gap-2 mb-2 text-primary font-semibold"><Zap size={16} className="text-emerald"/> Model AI Akurat</div>
+                  <div className="flex items-center gap-2 mb-2 text-primary font-semibold"><Zap size={16} className="text-emerald" /> Model AI Akurat</div>
                   <p className="text-xs text-muted">Model kami dilatih menggunakan dataset historis untuk memprediksi konsumsi kWh berdasarkan cuaca dan kebiasaan Anda.</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                  <div className="flex items-center gap-2 mb-2 text-primary font-semibold"><Leaf size={16} className="text-emerald"/> Saran Penghematan</div>
-                  <p className="text-xs text-muted">Selain prediksi, kami juga akan memberikan rekomendasi aksi nyata (saran) untuk membantu Anda menekan biaya listrik.</p>
+                  <div className="flex items-center gap-2 mb-2 text-primary font-semibold"><Leaf size={16} className="text-emerald" /> Saran Penghematan</div>
+                  <p className="text-xs text-muted">Selain prediksi, kami juga akan memberikan rekomendasi aksi nyata untuk membantu Anda menekan biaya listrik.</p>
                 </div>
               </div>
             </div>
@@ -243,7 +264,6 @@ const Predict = () => {
 
           {result && !loading && (
             <div className="animate-fade-in flex flex-col gap-6">
-              {/* Result Top Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 <div className="card relative overflow-hidden bg-gradient-to-br from-emerald-50 to-white" style={{ borderColor: 'rgba(16,185,129,0.2)' }}>
                   <p className="text-xs text-emerald mb-1 font-bold uppercase tracking-wider">Estimasi Konsumsi</p>
@@ -255,38 +275,45 @@ const Predict = () => {
                     <Calendar size={12} /> {formatDate(formData.tanggal)} • {formData.jam}:00
                   </p>
                 </div>
-                
+
                 <div className="card flex flex-col justify-center">
                   <p className="text-xs text-muted mb-2 font-medium uppercase tracking-wider">Status Pemakaian</p>
                   <div className="mb-2">
-                    <span className="badge badge-success px-4 py-1.5 text-sm">{result.kategori || "Normal"}</span>
+                    <span className="badge badge-success px-4 py-1.5 text-sm">{result.kategori || 'Normal'}</span>
                   </div>
-                  <p className="text-xs text-muted">Prediksi konsumsi berada dalam batas wajar.</p>
+                  <p className="text-xs text-muted">Prediksi konsumsi berdasarkan parameter Anda.</p>
                 </div>
-                
+
                 <div className="card flex flex-col justify-center">
                   <p className="text-xs text-muted mb-1 font-medium uppercase tracking-wider">Perbandingan</p>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-2xl font-bold text-emerald">+ 8.6%</span>
-                    <div className="p-1 bg-emerald-50 text-emerald rounded"><TrendingUp size={14} /></div>
-                  </div>
-                  <p className="text-[11px] text-muted">Dari rata-rata harian minggu ini.</p>
+                  {result.comparison ? (
+                    <>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`text-2xl font-bold ${result.comparison.up ? 'text-red-500' : 'text-emerald-600'}`}>
+                          {result.comparison.up ? '+' : ''}{result.comparison.pct}%
+                        </span>
+                        <div className={`p-1 rounded ${result.comparison.up ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald'}`}>
+                          {result.comparison.up ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-muted">Dari rata-rata 7 prediksi terakhir.</p>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-2xl font-bold text-muted">—</span>
+                      <p className="text-[11px] text-muted mt-1">Belum ada riwayat untuk perbandingan.</p>
+                    </>
+                  )}
                 </div>
               </div>
 
-              {/* Saran / Recommendations Section (Highlight!) */}
               <div className="card border-emerald-100 overflow-hidden relative" style={{ borderColor: 'rgba(16,185,129,0.3)', padding: 0 }}>
-                {/* Decorative background curve */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full blur-[100px] -mr-20 -mt-20 opacity-60 pointer-events-none"></div>
-                
                 <div className="p-6 relative z-10">
                   <h4 className="font-bold text-emerald text-lg mb-4 flex items-center gap-2" style={{ color: '#059669' }}>
                     <Lightbulb size={22} fill="currentColor" className="text-emerald-400" /> Saran Penghematan (Insight AI)
                   </h4>
-                  <p className="text-sm text-primary mb-5">
-                    Terapkan saran berikut untuk menurunkan konsumsi listrik Anda pada periode ini:
-                  </p>
-                  
+                  <p className="text-sm text-primary mb-5">Terapkan saran berikut untuk menurunkan konsumsi listrik Anda pada periode ini:</p>
                   <div className="flex flex-col gap-4">
                     {result.recommendations && result.recommendations.map((rec, idx) => (
                       <div key={idx} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex gap-4 items-start transition-transform hover:-translate-y-0.5">
@@ -294,40 +321,31 @@ const Predict = () => {
                           {idx === 0 ? <Zap size={18} fill="currentColor" /> : <Leaf size={18} />}
                         </div>
                         <div className="flex-1">
-                          <h5 className="font-bold text-primary text-sm mb-1">{rec.title || rec}</h5>
-                          {rec.savings && (
-                            <div className="flex items-center gap-3 mt-2">
-                              <span className="text-[11px] font-semibold text-emerald bg-emerald-50 px-2 py-0.5 rounded">Potensi Hemat: {rec.savings}</span>
-                              {rec.priority && (
-                                <span className="text-[11px] font-medium text-orange-500 bg-orange-50 px-2 py-0.5 rounded">Prioritas: {rec.priority}</span>
-                              )}
-                            </div>
-                          )}
+                          <h5 className="font-bold text-primary text-sm mb-1">{rec.title}</h5>
+                          <div className="flex items-center gap-3 mt-2">
+                            <span className="text-[11px] font-semibold text-emerald bg-emerald-50 px-2 py-0.5 rounded">Potensi Hemat: {rec.savings}</span>
+                            <span className="text-[11px] font-medium text-orange-500 bg-orange-50 px-2 py-0.5 rounded">Prioritas: {rec.priority}</span>
+                          </div>
                         </div>
                       </div>
                     ))}
                     {(!result.recommendations || result.recommendations.length === 0) && (
-                       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex gap-4 items-start">
-                         <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                           <Info size={18} />
-                         </div>
-                         <div className="flex-1">
-                           <h5 className="font-bold text-primary text-sm mb-1">Pertahankan Efisiensi Anda</h5>
-                           <p className="text-xs text-muted">Konsumsi Anda diprediksi sangat optimal. Tidak ada saran mendesak saat ini.</p>
-                         </div>
-                       </div>
+                      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex gap-4 items-start">
+                        <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5"><Info size={18} /></div>
+                        <div className="flex-1">
+                          <h5 className="font-bold text-primary text-sm mb-1">Pertahankan Efisiensi Anda</h5>
+                          <p className="text-xs text-muted">Konsumsi Anda diprediksi sangat optimal. Tidak ada saran mendesak saat ini.</p>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Chart Section */}
               <div className="card">
                 <div className="flex justify-between items-center mb-6">
                   <h4 className="font-bold text-sm text-primary">Grafik Tren Konsumsi (7 Hari Terakhir vs Prediksi)</h4>
-                  <div className="flex gap-2">
-                    <button className="text-muted hover:text-emerald p-1"><Download size={16} /></button>
-                  </div>
+                  <button className="text-muted hover:text-emerald p-1"><Download size={16} /></button>
                 </div>
                 <div className="w-full h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -335,7 +353,7 @@ const Predict = () => {
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
                       <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} dy={10} />
                       <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
-                      <Tooltip 
+                      <Tooltip
                         contentStyle={{ borderRadius: '8px', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)', fontSize: '12px' }}
                         itemStyle={{ color: 'var(--text-primary)', fontWeight: 600 }}
                       />
@@ -346,7 +364,6 @@ const Predict = () => {
                   </ResponsiveContainer>
                 </div>
               </div>
-
             </div>
           )}
         </div>
