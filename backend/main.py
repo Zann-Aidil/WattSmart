@@ -32,6 +32,15 @@ from backend.database import engine, Base
 
 # Create tables
 Base.metadata.create_all(bind=engine)
+
+# Migrate existing tables — add columns that didn't exist before create_all
+from sqlalchemy import text as _text
+with engine.connect() as _conn:
+    try:
+        _conn.execute(_text("ALTER TABLE users ADD COLUMN email TEXT"))
+        _conn.commit()
+    except Exception:
+        pass  # column already exists
 from backend.utils.logger import get_logger, setup_logging
 
 

@@ -33,7 +33,7 @@ const members = [
     name: 'M Najwan Naufal Alfarid',
     university: 'Politeknik Enjinering Indorama',
     department: 'Teknologi Rekayasa Perangkat Lunak',
-    photo: 'https://i.ibb.co.com/8g8Tsmpc/Whats-App-Image-2026-06-18-at-03-46-47.jpg',
+    photo: 'https://i.ibb.co.com/LD56vJ4F/Whats-App-Image-2026-06-18-at-05-06-39.jpg',
     linkedin: 'https://www.linkedin.com/in/najwanopal/',
     github: 'https://github.com/wanfalrid',
   },
