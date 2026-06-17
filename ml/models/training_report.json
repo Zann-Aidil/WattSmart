@@ -1,66 +1,68 @@
 {
-  "trained_at": "2026-06-16T16:12:47.754127+00:00",
-  "data_path": "data\\processed\\household_consumption_clean.csv",
-  "rows_train": 9600,
-  "rows_test": 2400,
-  "feature_count": 16,
+  "trained_at": "2026-06-17T06:21:37.883090",
+  "dataset": "UCI Household Electric Power Consumption",
+  "best_model": "XGBoost",
+  "n_days": 1409,
+  "n_features": 23,
   "feature_names": [
-    "jam",
-    "suhu_celsius",
-    "hari_libur",
-    "jumlah_penghuni",
-    "jumlah_perangkat_aktif",
-    "jam_penggunaan_rata_rata",
+    "gap_mean",
+    "gap_max",
+    "gap_std",
+    "voltage_mean",
+    "intensity_mean",
+    "sub1_kwh",
+    "sub2_kwh",
+    "sub3_kwh",
+    "unmetered_kwh",
+    "jam_aktif",
     "day_of_week",
     "month",
-    "is_weekend",
     "quarter",
-    "day_of_year",
+    "is_weekend",
+    "is_holiday_season",
     "lag_1",
+    "lag_2",
     "lag_7",
     "roll_mean_7",
-    "temp_x_appliances",
-    "occupants_x_hours"
+    "roll_std_7",
+    "roll_mean_30",
+    "ratio_sub3",
+    "ratio_unmetered"
   ],
+  "date_range": {
+    "start": "2006-12-24",
+    "end": "2010-11-25"
+  },
   "models": {
     "XGBoost": {
-      "mae": 0.8884,
-      "rmse": 1.1377,
-      "r2": 0.9037,
-      "mape": 4.9021
+      "Model": "XGBoost",
+      "MAE (kWh)": 0.0543,
+      "RMSE (kWh)": 0.0804,
+      "R\u00b2": 0.9999,
+      "MAPE (%)": 0.2800000011920929
     },
     "RandomForest": {
-      "mae": 0.9469,
-      "rmse": 1.2221,
-      "r2": 0.8889,
-      "mape": 5.2154
+      "Model": "Random Forest",
+      "MAE (kWh)": 0.0289,
+      "RMSE (kWh)": 0.0493,
+      "R\u00b2": 1.0,
+      "MAPE (%)": 0.15
     },
     "LinearRegression": {
-      "mae": 1.2169,
-      "rmse": 1.6093,
-      "r2": 0.8073,
-      "mape": 6.711
+      "Model": "Linear Regression",
+      "MAE (kWh)": 0.005,
+      "RMSE (kWh)": 0.0066,
+      "R\u00b2": 1.0,
+      "MAPE (%)": 0.02
     }
   },
-  "best_model": "XGBoost",
-  "best_model_target_met": true,
-  "xgb_tuning": {
-    "best_params": {
-      "subsample": 0.8,
-      "reg_lambda": 1.0,
-      "n_estimators": 200,
-      "min_child_weight": 1,
-      "max_depth": 4,
-      "learning_rate": 0.05,
-      "colsample_bytree": 0.8
-    },
-    "best_cv_rmse": 1.1791765725733339,
-    "cv_splits": 5,
-    "n_iter": 25
-  },
-  "training_seconds": {
-    "XGBoost": 98.722,
-    "RandomForest": 8.409,
-    "LinearRegression": 0.018
+  "best_params": {
+    "subsample": 0.7,
+    "n_estimators": 500,
+    "min_child_weight": 1,
+    "max_depth": 8,
+    "learning_rate": 0.02,
+    "gamma": 0,
+    "colsample_bytree": 1.0
   }
 }
