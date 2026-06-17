@@ -82,11 +82,8 @@ def delete_user_history(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> DeleteHistoryResponse:
-    count = db.query(PredictionHistory).filter(
+    deleted_count = db.query(PredictionHistory).filter(
         PredictionHistory.user_id == current_user.id
-    ).count()
-    db.query(PredictionHistory).filter(
-        PredictionHistory.user_id == current_user.id
-    ).delete()
+    ).delete(synchronize_session=False)
     db.commit()
-    return DeleteHistoryResponse(message="Riwayat berhasil dihapus", deleted_count=count)
+    return DeleteHistoryResponse(message="Riwayat berhasil dihapus", deleted_count=deleted_count)
