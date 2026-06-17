@@ -11,6 +11,8 @@ Anda juga dapat mengunduh model tersebut melalui tautan Google Drive berikut (pa
 
 ## Tim
 
+test
+
 | Nama | Peran |
 |------|-------|
 | Fauzan Aidil Luthfi | Project Lead & ML Engineer |
