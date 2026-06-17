@@ -43,6 +43,7 @@ const MemberCard = ({ member }) => (
       alt={member.name}
       className="w-24 h-24 rounded-full object-cover"
       onError={(e) => {
+        e.target.onerror = null;
         e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=059669&color=fff&size=96`;
       }}
     />
@@ -52,24 +53,38 @@ const MemberCard = ({ member }) => (
       <p className="text-sm text-gray-500">{member.department}</p>
     </div>
     <div className="flex items-center gap-4 mt-1">
-      <a
-        href={member.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-gray-400 hover:text-emerald-600 transition-colors"
-        aria-label={`LinkedIn ${member.name}`}
-      >
-        <Linkedin size={20} />
-      </a>
-      <a
-        href={member.github}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-gray-400 hover:text-gray-900 transition-colors"
-        aria-label={`GitHub ${member.name}`}
-      >
-        <Github size={20} />
-      </a>
+      {member.linkedin !== '#' && (
+        <a
+          href={member.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-400 hover:text-emerald-600 transition-colors"
+          aria-label={`LinkedIn ${member.name}`}
+        >
+          <Linkedin size={20} />
+        </a>
+      )}
+      {member.linkedin === '#' && (
+        <span className="text-gray-300" aria-hidden="true">
+          <Linkedin size={20} />
+        </span>
+      )}
+      {member.github !== '#' && (
+        <a
+          href={member.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-400 hover:text-gray-900 transition-colors"
+          aria-label={`GitHub ${member.name}`}
+        >
+          <Github size={20} />
+        </a>
+      )}
+      {member.github === '#' && (
+        <span className="text-gray-300" aria-hidden="true">
+          <Github size={20} />
+        </span>
+      )}
     </div>
   </div>
 );
@@ -88,8 +103,8 @@ const About = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {members.map((member) => (
-          <MemberCard key={member.name} member={member} />
+        {members.map((member, index) => (
+          <MemberCard key={index} member={member} />
         ))}
       </div>
     </div>
