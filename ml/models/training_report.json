@@ -1,68 +1,68 @@
 {
-  "trained_at": "2026-06-17T06:21:37.883090",
-  "dataset": "UCI Household Electric Power Consumption",
+  "trained_at": "2026-06-17T08:44:17.087507",
+  "dataset": "Sintetis 10.000 hari (17 fitur backend)",
   "best_model": "XGBoost",
-  "n_days": 1409,
-  "n_features": 23,
+  "n_rows": 10000,
+  "n_features": 17,
   "feature_names": [
-    "gap_mean",
-    "gap_max",
-    "gap_std",
-    "voltage_mean",
-    "intensity_mean",
-    "sub1_kwh",
-    "sub2_kwh",
-    "sub3_kwh",
-    "unmetered_kwh",
-    "jam_aktif",
-    "day_of_week",
-    "month",
-    "quarter",
-    "is_weekend",
-    "is_holiday_season",
+    "tanggal",
+    "jam",
+    "suhu_celsius",
+    "hari_libur",
+    "jumlah_penghuni",
+    "jumlah_perangkat_aktif",
+    "jam_penggunaan_rata_rata",
     "lag_1",
-    "lag_2",
     "lag_7",
     "roll_mean_7",
-    "roll_std_7",
-    "roll_mean_30",
-    "ratio_sub3",
-    "ratio_unmetered"
+    "day_of_week",
+    "month",
+    "is_weekend",
+    "quarter",
+    "day_of_year",
+    "temp_x_appliances",
+    "occupants_x_hours"
   ],
-  "date_range": {
-    "start": "2006-12-24",
-    "end": "2010-11-25"
-  },
-  "models": {
+  "metrics": {
     "XGBoost": {
       "Model": "XGBoost",
-      "MAE (kWh)": 0.0543,
-      "RMSE (kWh)": 0.0804,
-      "R\u00b2": 0.9999,
-      "MAPE (%)": 0.2800000011920929
+      "MAE": 0.4638,
+      "RMSE": 0.5951,
+      "R\u00b2": 0.899,
+      "MAPE (%)": 6.38
     },
     "RandomForest": {
       "Model": "Random Forest",
-      "MAE (kWh)": 0.0289,
-      "RMSE (kWh)": 0.0493,
-      "R\u00b2": 1.0,
-      "MAPE (%)": 0.15
+      "MAE": 0.4925,
+      "RMSE": 0.6272,
+      "R\u00b2": 0.8879,
+      "MAPE (%)": 6.75
     },
     "LinearRegression": {
       "Model": "Linear Regression",
-      "MAE (kWh)": 0.005,
-      "RMSE (kWh)": 0.0066,
-      "R\u00b2": 1.0,
-      "MAPE (%)": 0.02
+      "MAE": 0.4606,
+      "RMSE": 0.5933,
+      "R\u00b2": 0.8996,
+      "MAPE (%)": 6.3
     }
   },
   "best_params": {
-    "subsample": 0.7,
-    "n_estimators": 500,
+    "subsample": 1.0,
+    "n_estimators": 200,
     "min_child_weight": 1,
-    "max_depth": 8,
-    "learning_rate": 0.02,
-    "gamma": 0,
+    "max_depth": 4,
+    "learning_rate": 0.03,
+    "gamma": 0.1,
     "colsample_bytree": 1.0
+  },
+  "medians": {
+    "suhu_celsius": 27.0,
+    "jumlah_penghuni": 3.0,
+    "jumlah_perangkat_aktif": 6.0,
+    "jam_penggunaan_rata_rata": 10.9,
+    "lag_1": 7.745,
+    "lag_7": 7.745,
+    "roll_mean_7": 7.748,
+    "konsumsi_kwh": 7.7425
   }
 }

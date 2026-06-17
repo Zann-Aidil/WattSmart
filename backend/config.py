@@ -47,6 +47,11 @@ class Settings(BaseSettings):
     feature_names_path: str = str(REPO_ROOT / "ml" / "models" / "feature_names.json")
     training_report_path: str = str(REPO_ROOT / "ml" / "models" / "training_report.json")
 
+    def resolve_path(self, p: str) -> Path:
+        """Resolve p to absolute; if relative, anchor it to REPO_ROOT."""
+        path = Path(p)
+        return path if path.is_absolute() else REPO_ROOT / path
+
     # ----- Tariff -----
     tariff_per_kwh: float = Field(default=1444.70, description="PLN R-1/1300 VA default")
     currency_symbol: str = "Rp"

@@ -22,9 +22,9 @@ _training_report_cache: dict | None = None
 def _load_predictor() -> EnergyPredictor:
     settings = get_settings()
     return EnergyPredictor(
-        model_path=settings.model_path,
-        scaler_path=settings.scaler_path,
-        feature_names_path=settings.feature_names_path,
+        model_path=settings.resolve_path(settings.model_path),
+        scaler_path=settings.resolve_path(settings.scaler_path),
+        feature_names_path=settings.resolve_path(settings.feature_names_path),
     )
 
 
