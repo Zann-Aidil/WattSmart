@@ -1,4 +1,3 @@
-import React from 'react';
 import { Users, Linkedin, Github } from 'lucide-react';
 
 const members = [
