@@ -41,7 +41,7 @@ import pandas as pd
 import xgboost as xgb
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import RandomizedSearchCV, TimeSeriesSplit, train_test_split
+from sklearn.model_selection import RandomizedSearchCV, TimeSeriesSplit
 
 from ml.evaluate import RegressionMetrics, evaluate, format_metrics_table
 from ml.preprocessing import PreprocessingPipeline, TARGET_COL

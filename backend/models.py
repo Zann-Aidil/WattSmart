@@ -1,8 +1,14 @@
+from datetime import datetime, timezone
+
 from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-import datetime
 
 from backend.database import Base
+
+
+def _utc_now():
+    return datetime.now(timezone.utc)
+
 
 class User(Base):
     __tablename__ = "users"
@@ -10,7 +16,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=_utc_now)
 
     predictions = relationship("PredictionHistory", back_populates="user")
 
@@ -36,6 +42,6 @@ class PredictionHistory(Base):
     est_biaya = Column(Float)
     kategori = Column(String)
     
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=_utc_now)
 
     user = relationship("User", back_populates="predictions")

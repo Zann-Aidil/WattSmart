@@ -11,8 +11,6 @@ Anda juga dapat mengunduh model tersebut melalui tautan Google Drive berikut (pa
 
 ## Tim
 
-test
-
 | Nama | Peran |
 |------|-------|
 | Fauzan Aidil Luthfi | Project Lead & ML Engineer |
@@ -26,12 +24,13 @@ test
 2. **Estimasi Biaya** – Konversi otomatis ke Rupiah dengan tarif PLN R-1/1300 VA (Rp 1.444,70/kWh) yang configurable.
 3. **Rekomendasi Personal** – Rule-based engine menghasilkan saran hemat energi yang actionable dalam Bahasa Indonesia.
 4. **Dashboard Visual** – Tren konsumsi, breakdown perangkat, peak vs off-peak, dan penghematan potensial.
+5. **Autentikasi** – Register/login dengan JWT token, riwayat prediksi per user.
 
 ## Tech Stack
 
 - **Machine Learning**: XGBoost (main), scikit-learn (Random Forest, Linear Regression sebagai baseline), pandas, NumPy, matplotlib, seaborn
-- **Backend**: FastAPI, Uvicorn, Pydantic
-- **Frontend**: HTML5, CSS3, JavaScript vanilla, Bootstrap 5, Chart.js
+- **Backend**: FastAPI, Uvicorn, Pydantic, SQLAlchemy (SQLite), python-jose (JWT)
+- **Frontend**: React 19, Vite, Tailwind CSS 4, Recharts, Framer Motion, Lucide React
 - **Serialization**: joblib (`.pkl`)
 - **Testing**: pytest, httpx
 
@@ -42,8 +41,8 @@ smartenergy-predictor/
 ├── data/                # Dataset (raw + processed)
 ├── notebooks/           # Jupyter notebooks (EDA, training, evaluasi)
 ├── ml/                  # Modul ML (preprocessing, train, predict, recommendation)
-├── backend/             # FastAPI app
-├── frontend/            # HTML/CSS/JS UI
+├── backend/             # FastAPI app (routes, services, auth)
+├── frontend-react/      # React + Vite + Tailwind frontend
 ├── tests/               # Unit & integration tests
 ├── docs/                # Dokumentasi tambahan
 └── requirements.txt
@@ -92,13 +91,17 @@ npm run dev
 
 ## API Endpoints
 
-| Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| GET | `/api/health` | Status check |
-| GET | `/api/model-info` | Metadata model |
-| POST | `/api/predict` | Prediksi kWh + biaya |
-| POST | `/api/recommend` | Generate rekomendasi |
-| POST | `/api/predict-with-recommendations` | Prediksi + rekomendasi (one-shot) |
+| Method | Endpoint | Auth | Deskripsi |
+|--------|----------|------|-----------|
+| POST | `/api/auth/register` | — | Registrasi user baru |
+| POST | `/api/auth/login` | — | Login, dapatkan JWT token |
+| GET | `/api/auth/me` | ✅ | Info user yang login |
+| GET | `/api/health` | — | Status check |
+| GET | `/api/model-info` | — | Metadata model |
+| POST | `/api/predict` | ✅ | Prediksi kWh + biaya |
+| POST | `/api/recommend` | ✅ | Generate rekomendasi |
+| POST | `/api/predict-with-recommendations` | ✅ | Prediksi + rekomendasi (one-shot) |
+| GET | `/api/history` | ✅ | Riwayat prediksi (paginated) |
 
 Detail lengkap di [`docs/API_DOCUMENTATION.md`](docs/API_DOCUMENTATION.md).
 

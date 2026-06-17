@@ -11,14 +11,15 @@ const History = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/history', {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+        const res = await fetch(`${API_URL}/history?limit=200`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         if (!res.ok) throw new Error('Gagal memuat riwayat');
-        const data = await res.json();
-        setHistory(data);
+        const responseData = await res.json();
+        setHistory(responseData.data || []);
       } catch (err) {
         setError(err.message);
       } finally {

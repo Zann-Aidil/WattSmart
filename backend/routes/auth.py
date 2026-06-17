@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from typing import Dict
 
 from backend.deps import get_db, get_current_user
 from backend.models import User
@@ -9,16 +8,30 @@ from backend.utils.auth import get_password_hash, verify_password, create_access
 
 router = APIRouter()
 
+
 class UserCreate(BaseModel):
     username: str
     password: str
+
 
 class UserLogin(BaseModel):
     username: str
     password: str
 
-@router.post("/register")
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+    username: str
+
+
+class UserMeResponse(BaseModel):
+    username: str
+    created_at: str | None
+
+
+@router.post("/register", response_model=TokenResponse, summary="Registrasi user baru")
+def register_user(user: UserCreate, db: Session = Depends(get_db)) -> TokenResponse:
     db_user = db.query(User).filter(User.username == user.username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
@@ -31,10 +44,11 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     
     # Generate token immediately after register
     access_token = create_access_token(data={"sub": new_user.username})
-    return {"access_token": access_token, "token_type": "bearer", "username": new_user.username}
+    return TokenResponse(access_token=access_token, token_type="bearer", username=new_user.username)
 
-@router.post("/login")
-def login(user: UserLogin, db: Session = Depends(get_db)):
+
+@router.post("/login", response_model=TokenResponse, summary="Login dan dapatkan JWT token")
+def login(user: UserLogin, db: Session = Depends(get_db)) -> TokenResponse:
     db_user = db.query(User).filter(User.username == user.username).first()
     if not db_user or not verify_password(user.password, db_user.hashed_password):
         raise HTTPException(
@@ -44,8 +58,12 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
         )
     
     access_token = create_access_token(data={"sub": db_user.username})
-    return {"access_token": access_token, "token_type": "bearer", "username": db_user.username}
+    return TokenResponse(access_token=access_token, token_type="bearer", username=db_user.username)
 
-@router.get("/me")
-def read_users_me(current_user: User = Depends(get_current_user)):
-    return {"username": current_user.username, "created_at": current_user.created_at}
+
+@router.get("/me", response_model=UserMeResponse, summary="Info user yang sedang login")
+def read_users_me(current_user: User = Depends(get_current_user)) -> UserMeResponse:
+    return UserMeResponse(
+        username=current_user.username,
+        created_at=current_user.created_at.isoformat() if current_user.created_at else None,
+    )

@@ -72,3 +72,6 @@ htmlcov/
 # OS
 Thumbs.db
 desktop.ini
+
+# Database
+*.db

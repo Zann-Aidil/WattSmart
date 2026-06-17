@@ -12,11 +12,13 @@ const Analysis = () => {
   useEffect(() => {
     const fetchAnalysisData = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/history', {
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+        const res = await fetch(`${API_URL}/history?limit=200`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('Gagal memuat');
-        const historyData = await res.json();
+        const responseData = await res.json();
+        const historyData = responseData.data || [];
         
         if (historyData.length === 0) {
           setData(null);

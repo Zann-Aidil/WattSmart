@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import Field
 
+from backend.deps import get_current_user
+from backend.models import User
 from backend.schemas import PredictionInput, RecommendationResponse
 from backend.services.prediction_service import predict_consumption
 from backend.services.recommendation_service import build_recommendations
@@ -32,7 +34,10 @@ class RecommendInput(PredictionInput):
     response_model=RecommendationResponse,
     summary="Rekomendasi efisiensi energi berdasarkan input + prediksi",
 )
-async def recommend(payload: RecommendInput) -> RecommendationResponse:
+async def recommend(
+    payload: RecommendInput,
+    current_user: User = Depends(get_current_user),
+) -> RecommendationResponse:
     try:
         if payload.prediksi_kwh is None:
             kwh = predict_consumption(payload).prediksi_kwh
