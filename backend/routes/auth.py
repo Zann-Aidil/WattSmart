@@ -96,7 +96,8 @@ def update_profile(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> UpdateProfileResponse:
-    current_user.email = body.email
+    email = body.email.strip() if body.email else None
+    current_user.email = email or None
     db.commit()
     db.refresh(current_user)
     return UpdateProfileResponse(username=current_user.username, email=current_user.email)

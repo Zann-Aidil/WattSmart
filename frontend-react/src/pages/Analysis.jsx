@@ -82,9 +82,10 @@ const Analysis = () => {
 
         // 5. Dynamic date range
         const sortedDates = historyData.map(h => h.tanggal).filter(Boolean).sort();
+        const formatDate = (isoStr) => new Date(isoStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
         const dateRangeLabel = sortedDates.length >= 2
-          ? `${sortedDates[0]} – ${sortedDates[sortedDates.length - 1]}`
-          : sortedDates.length === 1 ? sortedDates[0] : '—';
+          ? `${formatDate(sortedDates[0])} – ${formatDate(sortedDates[sortedDates.length - 1])}`
+          : sortedDates.length === 1 ? formatDate(sortedDates[0]) : '—';
 
         // 6. Dynamic insights
         const half = Math.floor(historyData.length / 2);

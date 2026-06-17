@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { predictConsumption } from '../services/api';
 import {
   Calendar, Clock, Thermometer, Users, Monitor,
@@ -24,6 +24,16 @@ const Predict = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    if (!token) return;
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+    fetch(`${API_URL}/history?limit=10`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.ok ? r.json() : { data: [] })
+      .then(d => setHistory(d.data || []))
+      .catch(() => {});
+  }, [token]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -53,18 +63,8 @@ const Predict = () => {
     try {
       const data = await predictConsumption(payload);
 
-      // Fetch last 7 history items for chart and comparison
-      let historyItems = [];
-      try {
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-        const histRes = await fetch(`${API_URL}/history?limit=10`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (histRes.ok) {
-          const histData = await histRes.json();
-          historyItems = histData.data || [];
-        }
-      } catch { /* ignore history fetch failure */ }
+      // Use history fetched on mount for chart and comparison
+      const historyItems = history;
 
       // Build chart: 7 most recent (oldest first) + today's prediction
       const chartData = historyItems
