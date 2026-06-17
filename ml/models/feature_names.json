@@ -1,0 +1,18 @@
+[
+  "jam",
+  "suhu_celsius",
+  "hari_libur",
+  "jumlah_penghuni",
+  "jumlah_perangkat_aktif",
+  "jam_penggunaan_rata_rata",
+  "day_of_week",
+  "month",
+  "is_weekend",
+  "quarter",
+  "day_of_year",
+  "lag_1",
+  "lag_7",
+  "roll_mean_7",
+  "temp_x_appliances",
+  "occupants_x_hours"
+]

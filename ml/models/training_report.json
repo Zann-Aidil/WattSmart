@@ -1,0 +1,66 @@
+{
+  "trained_at": "2026-06-16T16:12:47.754127+00:00",
+  "data_path": "data\\processed\\household_consumption_clean.csv",
+  "rows_train": 9600,
+  "rows_test": 2400,
+  "feature_count": 16,
+  "feature_names": [
+    "jam",
+    "suhu_celsius",
+    "hari_libur",
+    "jumlah_penghuni",
+    "jumlah_perangkat_aktif",
+    "jam_penggunaan_rata_rata",
+    "day_of_week",
+    "month",
+    "is_weekend",
+    "quarter",
+    "day_of_year",
+    "lag_1",
+    "lag_7",
+    "roll_mean_7",
+    "temp_x_appliances",
+    "occupants_x_hours"
+  ],
+  "models": {
+    "XGBoost": {
+      "mae": 0.8884,
+      "rmse": 1.1377,
+      "r2": 0.9037,
+      "mape": 4.9021
+    },
+    "RandomForest": {
+      "mae": 0.9469,
+      "rmse": 1.2221,
+      "r2": 0.8889,
+      "mape": 5.2154
+    },
+    "LinearRegression": {
+      "mae": 1.2169,
+      "rmse": 1.6093,
+      "r2": 0.8073,
+      "mape": 6.711
+    }
+  },
+  "best_model": "XGBoost",
+  "best_model_target_met": true,
+  "xgb_tuning": {
+    "best_params": {
+      "subsample": 0.8,
+      "reg_lambda": 1.0,
+      "n_estimators": 200,
+      "min_child_weight": 1,
+      "max_depth": 4,
+      "learning_rate": 0.05,
+      "colsample_bytree": 0.8
+    },
+    "best_cv_rmse": 1.1791765725733339,
+    "cv_splits": 5,
+    "n_iter": 25
+  },
+  "training_seconds": {
+    "XGBoost": 98.722,
+    "RandomForest": 8.409,
+    "LinearRegression": 0.018
+  }
+}

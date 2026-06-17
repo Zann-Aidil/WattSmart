@@ -1,0 +1,41 @@
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, DateTime
+from sqlalchemy.orm import relationship
+import datetime
+
+from backend.database import Base
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+    predictions = relationship("PredictionHistory", back_populates="user")
+
+
+class PredictionHistory(Base):
+    __tablename__ = "prediction_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    
+    # Input parameters
+    tanggal = Column(String)
+    jam = Column(Integer)
+    suhu = Column(Float)
+    penghuni = Column(Integer)
+    perangkat_aktif = Column(Integer)
+    jam_pemakaian = Column(Float)
+    is_holiday = Column(Boolean)
+    is_weekend = Column(Boolean)
+
+    # Results
+    pred_kwh = Column(Float)
+    est_biaya = Column(Float)
+    kategori = Column(String)
+    
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+    user = relationship("User", back_populates="predictions")
