@@ -11,12 +11,13 @@ Anda juga dapat mengunduh model tersebut melalui tautan Google Drive berikut (pa
 
 ## Tim
 
-| Nama | Peran |
+| Nama | Peran || Kontribusi | 
 |------|-------|
-| Fauzan Aidil Luthfi | Project Lead & ML Engineer |
-| Vincent Christian | Backend Engineer |
-| Mochamad Abdul Rozag | Frontend Engineer |
-| Muhammad Najwan Naufal Alfarid | Data Engineer |
+|------|-------|
+| Fauzan Aidil Luthfi | Project Manager, Full Stack Developer, Data Analyst | Memimpin proyek dan mengoordinasikan pengembangan sistem. Bertanggung jawab dalam pencarian dan pengolahan dataset, integrasi database, pengembangan frontend menggunakan React.js, peningkatan antarmuka pengguna, integrasi backend dengan database, serta penyempurnaan fitur aplikasi hingga tahap final.
+| Vincent Christian | Frontend Developer, System Integration Support |
+| Mochamad Abdul Rozag | Backend Developer, Deployment Engineer, DevOps Support |
+| Muhammad Najwan Naufal Alfarid | Machine Learning Engineer, Backend Developer, UI/UX Designer |
 
 ## Fitur Utama
 
