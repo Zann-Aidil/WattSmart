@@ -1,4 +1,4 @@
-# SmartEnergy Predictor
+# WattSmart Predictor
 
 Sistem prediksi konsumsi listrik rumah tangga berbasis AI lengkap dengan rekomendasi efisiensi energi personal. Dibangun sebagai capstone project **PJK-GM096** (Pijak x IBM SkillsBuild) dengan tema *AI for Business Intelligence and Market Insights*.
 
