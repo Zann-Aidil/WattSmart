@@ -11,13 +11,42 @@ Anda juga dapat mengunduh model tersebut melalui tautan Google Drive berikut (pa
 
 ## Tim
 
-| Nama | Peran || Kontribusi | 
-|------|-------|
-|------|-------|
-| Fauzan Aidil Luthfi | Project Manager, Full Stack Developer, Data Analyst | Memimpin proyek dan mengoordinasikan pengembangan sistem. Bertanggung jawab dalam pencarian dan pengolahan dataset, integrasi database, pengembangan frontend menggunakan React.js, peningkatan antarmuka pengguna, integrasi backend dengan database, serta penyempurnaan fitur aplikasi hingga tahap final.
-| Vincent Christian | Frontend Developer, System Integration Support |
-| Mochamad Abdul Rozag | Backend Developer, Deployment Engineer, DevOps Support |
-| Muhammad Najwan Naufal Alfarid | Machine Learning Engineer, Backend Developer, UI/UX Designer |
+| Member | Role |
+|---------|---------|
+| **Fauzan Aidil Luthfi** | Project Manager & Full Stack Developer |
+| **Muhammad Najwan Naufal Alfarid** | Machine Learning Engineer & Backend Developer |
+| **Vincent Christian** | Frontend Developer |
+| **Mochamad Abdul Rozag** | Backend & DevOps Engineer |
+
+### Contribution Details
+
+#### Fauzan Aidil Luthfi
+- Led project planning and team coordination
+- Collected and processed datasets
+- Integrated database systems
+- Migrated frontend to React.js
+- Improved UI/UX and application architecture
+- Integrated backend services with database
+- Finalized core application features
+
+#### Muhammad Najwan Naufal Alfarid
+- Developed and trained XGBoost machine learning model
+- Built initial FastAPI backend services
+- Designed initial UI/UX using HTML and CSS
+- Conducted model evaluation and experimentation
+
+#### Vincent Christian
+- Assisted frontend development
+- Configured Node.js development environment
+- Proposed user authentication and account management features
+- Supported frontend-backend integration
+
+#### Mochamad Abdul Rozag
+- Assisted backend refinement and optimization
+- Finalized API integration and system stability
+- Deployed application to VPS infrastructure
+- Configured domain, DNS, and Cloudflare services
+- Ensured production-ready deployment
 
 ## Fitur Utama
 
