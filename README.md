@@ -7,7 +7,7 @@ Sistem prediksi konsumsi listrik rumah tangga berbasis AI lengkap dengan rekomen
 ## Tautan Model ML
 Sesuai dengan ketentuan Capstone, model XGBoost yang telah dilatih (`xgboost_model.pkl`) dan file penunjang scaler disimpan pada folder `ml/models/`. 
 Anda juga dapat mengunduh model tersebut melalui tautan Google Drive berikut (pastikan tim assessor menggunakan akun pijak@student.devacademy.id untuk akses):
-**[Tautan Google Drive Model (Masukkan Link GDrive di sini)](#)**
+**[https://drive.google.com/file/d/1_oPv5ub042deXNdB7pQzcTPh0s1POLz3/view?usp=sharing](#)**
 
 ## Tim
 
